@@ -4,6 +4,10 @@ import React, { Component } from 'react';
 
 export default class Agenda extends Component {
   render() {
-    return <div />;
+    return (
+      <div>
+        <h1>teste</h1>
+      </div>
+    );
   }
 }
