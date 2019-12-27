@@ -3,9 +3,9 @@ import React from 'react';
 import { CardContainer, IconContainer, InfoContainer } from './styles.css';
 
 const Card = ({
- icon, name, email, phone 
+ icon, name, email, phone, onCardClick
 }) => (
-  <CardContainer>
+  <CardContainer onClick={onCardClick}>
     <IconContainer>{icon}</IconContainer>
     <InfoContainer>
       <div>

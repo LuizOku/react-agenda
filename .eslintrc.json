@@ -11,8 +11,9 @@
         "error",
         {
           "extensions": [".js", ".jsx"]
-        }
+        },
       ],
+      "react/prop-types": 0,
       "global-require": "off",
       "import/prefer-default-export": "off",
       "no-unused-expressions": ["error", { "allowTaggedTemplates": true }]
