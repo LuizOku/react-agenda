@@ -1,13 +1,18 @@
 import React, { Component } from 'react';
 
+import { withRouter } from 'react-router-dom';
 import { FaPhone } from 'react-icons/fa';
 import { Input } from '../../components/Input/styles.css';
 
 import {
-  Container, LoginContainer, LoginHeader, LoginBody, StyledButton,
+  Container,
+  LoginContainer,
+  LoginHeader,
+  LoginBody,
+  StyledButton,
 } from './styles.css';
 
-export default class Login extends Component {
+class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -15,26 +20,36 @@ export default class Login extends Component {
       password: undefined,
       userRequiredError: false,
       passwordRequiredError: false,
-      invalidLoginError: false,
       errorMessage: undefined,
     };
   }
 
   handleLogin = () => {
     const { user, password } = this.state;
+    const { history } = this.props;
     if (this.isAuthenticationValid(user, password)) {
-      console.log('passou');
-    } else {
-      console.log('nao passou');
+      const auth = {
+        user,
+        password,
+      };
+      localStorage.setItem('auth', JSON.stringify(auth));
+      history.push('/agenda');
     }
-  }
+  };
 
   isAuthenticationValid = (user, password) => {
+    this.setState({
+      userRequiredError: false,
+      passwordRequiredError: false,
+      errorMessage: undefined,
+    });
     let obj = {};
-
     if (user && password) {
       if (user !== 'admin' || password !== 'admin') {
-        obj = { ...obj, invalidLoginError: true, errorMessage: 'Usuário ou senha incorretos' };
+        obj = {
+          ...obj,
+          errorMessage: 'Usuário ou senha incorretos',
+        };
       }
     } else {
       if (!user) {
@@ -50,18 +65,21 @@ export default class Login extends Component {
       this.setState({
         userRequiredError: false,
         passwordRequiredError: false,
-        invalidLoginError: false,
         errorMessage: undefined,
       });
       return true;
     }
     this.setState({ user, password, ...obj });
     return false;
-  }
+  };
 
   render() {
     const {
-      user, password, userRequiredError, passwordRequiredError, invalidLoginError, errorMessage,
+      user,
+      password,
+      userRequiredError,
+      passwordRequiredError,
+      errorMessage,
     } = this.state;
     return (
       <Container>
@@ -71,8 +89,19 @@ export default class Login extends Component {
             <span> React Agenda</span>
           </LoginHeader>
           <LoginBody>
-            <Input hasError={userRequiredError} onChange={(e) => this.setState({ user: e.target.value })} value={user} placeholder="usuário" />
-            <Input hasError={passwordRequiredError} onChange={(e) => this.setState({ password: e.target.value })} value={password} type="password" placeholder="senha" />
+            <Input
+              hasError={userRequiredError}
+              onChange={(e) => this.setState({ user: e.target.value })}
+              value={user}
+              placeholder="usuário"
+            />
+            <Input
+              hasError={passwordRequiredError}
+              onChange={(e) => this.setState({ password: e.target.value })}
+              value={password}
+              type="password"
+              placeholder="senha"
+            />
             <StyledButton onClick={this.handleLogin}>Entrar</StyledButton>
             <span>{errorMessage}</span>
           </LoginBody>
@@ -81,3 +110,5 @@ export default class Login extends Component {
     );
   }
 }
+
+export default withRouter(Login);

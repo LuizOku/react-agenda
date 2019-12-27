@@ -12,18 +12,20 @@ export const LoginContainer = styled.div`
   width: 400px;
   height: 400px;
   padding: 0 70px;
-  background: #FFF;
+  background: #fff;
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 15px;
   flex-direction: column;
+  box-shadow: 0 8px 17px 2px rgba(0, 0, 0, 0.14),
+    0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.2);
 `;
 
 export const LoginHeader = styled.div`
-  font-size: 30px;
   display: flex;
   align-items: center;
+  font-size: 30px;
   font-weight: bold;
   margin-bottom: 50px;
   color: #006064;
@@ -39,7 +41,7 @@ export const LoginBody = styled.div`
   span {
     margin-top: 10px;
     text-align: center;
-    color: #D50000;
+    color: #d50000;
   }
 `;
 
