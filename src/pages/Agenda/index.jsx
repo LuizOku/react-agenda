@@ -2,12 +2,14 @@ import React, { Component } from 'react';
 
 import uuid from 'uuid';
 import { FaPhone, FaUserCircle, FaSearch } from 'react-icons/fa';
+import { withRouter } from 'react-router-dom';
 
 import { checkEmail, checkPhone } from '../../utils/validations';
 import { PHONE_MASK } from '../../utils/masks';
 import { FabButton } from '../../components/FabButton/styles.css';
 import Card from '../../components/Card';
 import BaloonModal from '../../components/BaloonModal';
+import CheckBox from '../../components/CheckBox';
 import { Input, StyledMaskedInput } from '../../components/Input/styles.css';
 import {
   Container,
@@ -18,7 +20,7 @@ import {
   SearchButton
 } from './styles.css';
 
-export default class Agenda extends Component {
+class Agenda extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -32,18 +34,40 @@ export default class Agenda extends Component {
       email: undefined,
       emailRequiredError: false,
       errorMessage: undefined,
+      isPublic: false,
       isAnUpdate: false,
       contactToEdit: undefined
     };
   }
 
   componentDidMount() {
+    const { history } = this.props;
+    // Verifica se o usuário da URL é o mesmo guardado no storage.
+    if (this.getUserFromPath() && this.getUserFromPath() !== this.getUserFromStorage()) {
+      history.push('/');
+    }
     // Recupera os dados de contatos do storage.
     const contacts = this.getContactsFromStorage();
     this.setState({
       contacts
     });
   }
+
+  /**
+   * Recupera o usuário que está na url.
+   */
+  getUserFromPath = () => this.props.match.params.user;
+
+  /**
+   * Recupera o usuario do storage.
+   */
+  getUserFromStorage = () => {
+    const userStorage = localStorage.getItem('auth');
+    if (userStorage) {
+      return JSON.parse(userStorage).user;
+    }
+    return undefined;
+  };
 
   /**
    * Compara os contatos para ordenar alfabéticamente.
@@ -64,12 +88,28 @@ export default class Agenda extends Component {
   /**
    * Recupera os contatos do storage.
    */
-  getContactsFromStorage = () => {
+  getContactsFromStorage = (publicContact) => {
+    const user = this.getUserFromPath();
     const contactsStorage = localStorage.getItem('contacts');
     if (contactsStorage) {
-      return JSON.parse(contactsStorage).sort(this.compare);
+      const contacts = JSON.parse(contactsStorage);
+      if (user && !publicContact) {
+        return contacts[user] ? contacts[user].sort(this.compare) : [];
+      }
+      return contacts['public'] ? contacts['public'].sort(this.compare) : [];
     }
     return [];
+  };
+
+  /**
+   * Recupera todos os contatos do storage.
+   */
+  getAllContactsObject = () => {
+    const contactsStorage = localStorage.getItem('contacts');
+    if (contactsStorage) {
+      return JSON.parse(contactsStorage);
+    }
+    return {};
   };
 
   /**
@@ -96,27 +136,41 @@ export default class Agenda extends Component {
       phoneRequiredError: false,
       email: undefined,
       emailRequiredError: false,
+      isPublic: false,
       errorMessage: undefined,
       isAnUpdate: false,
       contactToEdit: undefined
     });
   };
 
+  /**
+   *  Preenche os campos do formulário para editar o contato.
+   */
   handleUpdateContact = contact => {
     this.setState({
       name: contact.name,
       phone: contact.phone,
       email: contact.email,
+      isPublic: contact.isPublic,
       isAddModalVisible: true,
       isAnUpdate: true,
       contactToEdit: contact.email
     });
   };
 
+  /**
+   *  Deleta o contato.
+   */
   handleRemoveContact = email => {
     const contacts = this.getContactsFromStorage();
     const newContacts = contacts.filter(contact => contact.email !== email);
-    localStorage.setItem('contacts', JSON.stringify(newContacts));
+    let objToSave;
+    if (this.getUserFromPath()) {
+      objToSave = { ...this.getAllContactsObject(), [this.getUserFromPath()]: newContacts};
+    } else {
+      objToSave = { ...this.getAllContactsObject(), public: newContacts};
+    }
+    localStorage.setItem('contacts', JSON.stringify(objToSave));
     this.setState({
       contacts: this.getContactsFromStorage()
     });
@@ -127,14 +181,20 @@ export default class Agenda extends Component {
    * Salva um novo contato.
    */
   handleSaveContact = () => {
-    const { name, phone, email, isAnUpdate, contactToEdit } = this.state;
-    const contacts = this.getContactsFromStorage();
+    const { name, phone, email, isPublic, isAnUpdate, contactToEdit } = this.state;
+    let contacts;
+    if (!isPublic) {
+      contacts = this.getContactsFromStorage();
+    } else {
+      contacts = this.getContactsFromStorage(true);
+    }
     // Realiza a verificação dos campos.
     if (this.isContactValid(name, phone, email, contacts)) {
       const contact = {
         name,
-        phone,
-        email
+        phone: phone.replace(/[-+()\s]/g, ''),
+        email,
+        isPublic
       };
       let newContacts = [];
       if (isAnUpdate) {
@@ -145,8 +205,14 @@ export default class Agenda extends Component {
       } else {
         newContacts = [...contacts, contact];
       }
+      let objToSave;
+      if (!isPublic) {
+        objToSave = { ...this.getAllContactsObject(), [this.getUserFromPath()]: newContacts}
+      } else {
+        objToSave = { ...this.getAllContactsObject(), public: newContacts}
+      }
       // Adiciona o contato do storage.
-      localStorage.setItem('contacts', JSON.stringify(newContacts));
+      localStorage.setItem('contacts', JSON.stringify(objToSave));
       this.setState({
         contacts: this.getContactsFromStorage()
       });
@@ -236,6 +302,7 @@ export default class Agenda extends Component {
       phoneRequiredError,
       email,
       emailRequiredError,
+      isPublic,
       errorMessage,
       isAnUpdate
     } = this.state;
@@ -271,6 +338,11 @@ export default class Agenda extends Component {
           placeholder="telefone"
           onKeyDown={e => e.key === 'Enter' && this.handleSaveContact()}
         />
+        <CheckBox
+          label="Contato público"
+          checked={isPublic}
+          onChange={() => this.setState({ isPublic: !isPublic })}
+        />
       </BaloonModal>
     );
   };
@@ -304,7 +376,7 @@ export default class Agenda extends Component {
                 icon={<FaUserCircle />}
                 name={contact.name}
                 email={contact.email}
-                phone={contact.phone}
+                phone={`(${contact.phone.substring(0, 2)}) ${contact.phone.substring(2, 7)}-${contact.phone.substring(7, 11)}`}
               />
             ))
           ) : (
@@ -318,3 +390,5 @@ export default class Agenda extends Component {
     );
   }
 }
+
+export default withRouter(Agenda);

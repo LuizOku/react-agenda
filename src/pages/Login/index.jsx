@@ -39,7 +39,7 @@ class Login extends Component {
       // Adiciona o usuario e senha do storage.
       localStorage.setItem('auth', JSON.stringify(auth));
       // Direciona para a tela da agenda.
-      history.push('/agenda');
+      history.push(`/agenda/${user}`);
     }
   };
 
