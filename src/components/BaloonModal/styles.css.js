@@ -7,13 +7,13 @@ export const Container = styled.div`
   width: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   position: absolute;
-  z-index: 10
+  z-index: 10;
 `;
 
 export const ModalContainer = styled.div`
   height: 450px;
   width: 350px;
-  background: #FFF;
+  background: #fff;
   border-radius: 15px 15px 0 15px;
   position: fixed;
   bottom: 45px;

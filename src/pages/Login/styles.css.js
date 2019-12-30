@@ -44,6 +44,14 @@ export const LoginBody = styled.div`
     text-align: center;
     color: #d50000;
   }
+  a {
+    text-align: center;
+    text-decoration: none;
+    color: #006064;
+    &:hover {
+      color: #80deea;
+    }
+  }
 `;
 
 export const StyledButton = styled(Button)`

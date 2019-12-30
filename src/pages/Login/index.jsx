@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 import { FaPhone } from 'react-icons/fa';
 
 import { Input } from '../../components/Input/styles.css';
@@ -9,7 +9,7 @@ import {
   LoginContainer,
   LoginHeader,
   LoginBody,
-  StyledButton,
+  StyledButton
 } from './styles.css';
 
 class Login extends Component {
@@ -20,7 +20,7 @@ class Login extends Component {
       password: undefined,
       userRequiredError: false,
       passwordRequiredError: false,
-      errorMessage: undefined,
+      errorMessage: undefined
     };
   }
 
@@ -34,7 +34,7 @@ class Login extends Component {
     if (this.isAuthenticationValid(user, password)) {
       const auth = {
         user,
-        password,
+        password
       };
       // Adiciona o usuario e senha do storage.
       localStorage.setItem('auth', JSON.stringify(auth));
@@ -50,7 +50,7 @@ class Login extends Component {
     this.setState({
       userRequiredError: false,
       passwordRequiredError: false,
-      errorMessage: undefined,
+      errorMessage: undefined
     });
     let obj = {};
     // Valida se usuário e senha foram preenchidos.
@@ -59,7 +59,7 @@ class Login extends Component {
       if (user !== 'admin' || password !== 'admin') {
         obj = {
           ...obj,
-          errorMessage: 'Usuário ou senha incorretos',
+          errorMessage: 'Usuário ou senha incorretos'
         };
       }
     } else {
@@ -78,7 +78,7 @@ class Login extends Component {
       this.setState({
         userRequiredError: false,
         passwordRequiredError: false,
-        errorMessage: undefined,
+        errorMessage: undefined
       });
       return true;
     }
@@ -93,7 +93,7 @@ class Login extends Component {
       password,
       userRequiredError,
       passwordRequiredError,
-      errorMessage,
+      errorMessage
     } = this.state;
     return (
       <Container>
@@ -105,20 +105,21 @@ class Login extends Component {
           <LoginBody>
             <Input
               haserror={userRequiredError}
-              onChange={(e) => this.setState({ user: e.target.value })}
+              onChange={e => this.setState({ user: e.target.value })}
               value={user}
               placeholder="usuário"
-              onKeyDown={(e) => e.key === 'Enter' && this.handleLogin()}
+              onKeyDown={e => e.key === 'Enter' && this.handleLogin()}
             />
             <Input
               haserror={passwordRequiredError}
-              onChange={(e) => this.setState({ password: e.target.value })}
+              onChange={e => this.setState({ password: e.target.value })}
               value={password}
               type="password"
               placeholder="senha"
-              onKeyDown={(e) => e.key === 'Enter' && this.handleLogin()}
+              onKeyDown={e => e.key === 'Enter' && this.handleLogin()}
             />
             <StyledButton onClick={this.handleLogin}>Entrar</StyledButton>
+            <Link to="/agenda">Contatos públicos</Link>
             <span>{errorMessage}</span>
           </LoginBody>
         </LoginContainer>

@@ -8,7 +8,8 @@ const Routes = () => (
   <BrowserRouter>
     <Switch>
       <Route exact path="/" component={() => <Login />} />
-      <PrivateRoute exact path="/agenda" component={() => <Agenda />} />
+      <PrivateRoute exact path="/agenda/:user" component={() => <Agenda />} />
+      <Route exact path="/agenda" component={() => <Agenda />} />
       <Route component={() => <h1>404</h1>} />
     </Switch>
   </BrowserRouter>

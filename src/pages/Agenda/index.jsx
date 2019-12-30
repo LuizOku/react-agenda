@@ -4,18 +4,18 @@ import uuid from 'uuid';
 import { FaPhone, FaUserCircle, FaSearch } from 'react-icons/fa';
 
 import { checkEmail, checkPhone } from '../../utils/validations';
-import {PHONE_MASK} from '../../utils/masks';
+import { PHONE_MASK } from '../../utils/masks';
 import { FabButton } from '../../components/FabButton/styles.css';
 import Card from '../../components/Card';
 import BaloonModal from '../../components/BaloonModal';
-import { Input, StyledMaskedInput} from '../../components/Input/styles.css';
+import { Input, StyledMaskedInput } from '../../components/Input/styles.css';
 import {
   Container,
   Header,
   AgendaBody,
   SearchContainer,
   StyledInput,
-  SearchButton,
+  SearchButton
 } from './styles.css';
 
 export default class Agenda extends Component {
@@ -33,7 +33,7 @@ export default class Agenda extends Component {
       emailRequiredError: false,
       errorMessage: undefined,
       isAnUpdate: false,
-      contactToEdit: undefined,
+      contactToEdit: undefined
     };
   }
 
@@ -41,7 +41,7 @@ export default class Agenda extends Component {
     // Recupera os dados de contatos do storage.
     const contacts = this.getContactsFromStorage();
     this.setState({
-      contacts,
+      contacts
     });
   }
 
@@ -79,7 +79,7 @@ export default class Agenda extends Component {
     const { searchText } = this.state;
     const contacts = this.getContactsFromStorage();
     const filteredList = contacts.filter(
-      (item) => item.name.toLowerCase().search(searchText.toLowerCase()) !== -1,
+      item => item.name.toLowerCase().search(searchText.toLowerCase()) !== -1
     );
     this.setState({ contacts: filteredList.sort(this.compare) });
   };
@@ -98,9 +98,9 @@ export default class Agenda extends Component {
       emailRequiredError: false,
       errorMessage: undefined,
       isAnUpdate: false,
-      contactToEdit: undefined,
+      contactToEdit: undefined
     });
-  }
+  };
 
   handleUpdateContact = contact => {
     this.setState({
@@ -109,19 +109,19 @@ export default class Agenda extends Component {
       email: contact.email,
       isAddModalVisible: true,
       isAnUpdate: true,
-      contactToEdit: contact.email,
+      contactToEdit: contact.email
     });
-  }
+  };
 
   handleRemoveContact = email => {
     const contacts = this.getContactsFromStorage();
     const newContacts = contacts.filter(contact => contact.email !== email);
     localStorage.setItem('contacts', JSON.stringify(newContacts));
     this.setState({
-      contacts: this.getContactsFromStorage(),
+      contacts: this.getContactsFromStorage()
     });
     this.handleCloseAddModal();
-  }
+  };
 
   /**
    * Salva um novo contato.
@@ -134,11 +134,13 @@ export default class Agenda extends Component {
       const contact = {
         name,
         phone,
-        email,
+        email
       };
       let newContacts = [];
       if (isAnUpdate) {
-        const contactWithouEdit = contacts.filter(contact => contact.email !== contactToEdit);
+        const contactWithouEdit = contacts.filter(
+          contact => contact.email !== contactToEdit
+        );
         newContacts = [...contactWithouEdit, contact];
       } else {
         newContacts = [...contacts, contact];
@@ -146,11 +148,11 @@ export default class Agenda extends Component {
       // Adiciona o contato do storage.
       localStorage.setItem('contacts', JSON.stringify(newContacts));
       this.setState({
-        contacts: this.getContactsFromStorage(),
+        contacts: this.getContactsFromStorage()
       });
       this.handleCloseAddModal();
     }
-  }
+  };
 
   /**
    * Valida os campos do formulário.
@@ -160,9 +162,9 @@ export default class Agenda extends Component {
       nameRequiredError: false,
       phoneRequiredError: false,
       emailRequiredError: false,
-      errorMessage: undefined,
+      errorMessage: undefined
     });
-    const {isAnUpdate} = this.state;
+    const { isAnUpdate } = this.state;
     let obj = {};
     if (!name || !phone || !email) {
       // Valida se nome não foi preenchido.
@@ -181,17 +183,29 @@ export default class Agenda extends Component {
     } else {
       // Valida se email é válido.
       if (!checkEmail(email)) {
-        obj = { ...obj, emailRequiredError: true, errorMessage: 'Dados inválidos' };
+        obj = {
+          ...obj,
+          emailRequiredError: true,
+          errorMessage: 'Dados inválidos'
+        };
       }
       // Valida se telefone é válido.
       if (!checkPhone(phone)) {
-        obj = { ...obj, phoneRequiredError: true, errorMessage: 'Dados inválidos' };
+        obj = {
+          ...obj,
+          phoneRequiredError: true,
+          errorMessage: 'Dados inválidos'
+        };
       }
       if (!obj.phoneRequiredError && !isAnUpdate) {
         // Valida se telefone está repetido.
         const findPhone = contacts.find(contact => contact.phone === phone);
         if (findPhone) {
-          obj = { ...obj, phoneRequiredError: true, errorMessage: 'Telefone já cadastrado' };
+          obj = {
+            ...obj,
+            phoneRequiredError: true,
+            errorMessage: 'Telefone já cadastrado'
+          };
         }
       }
     }
@@ -201,7 +215,7 @@ export default class Agenda extends Component {
         nameRequiredError: false,
         phoneRequiredError: false,
         emailRequiredError: false,
-        errorMessage: undefined,
+        errorMessage: undefined
       });
       return true;
     }
@@ -214,7 +228,17 @@ export default class Agenda extends Component {
    * Renderiza a modal de adicionar contatos
    */
   renderAddModal = () => {
-    const { isAddModalVisible, name, nameRequiredError, phone, phoneRequiredError, email, emailRequiredError, errorMessage, isAnUpdate } = this.state;
+    const {
+      isAddModalVisible,
+      name,
+      nameRequiredError,
+      phone,
+      phoneRequiredError,
+      email,
+      emailRequiredError,
+      errorMessage,
+      isAnUpdate
+    } = this.state;
     return (
       <BaloonModal
         cancelAction={this.handleCloseAddModal}
@@ -222,33 +246,34 @@ export default class Agenda extends Component {
         deleteAction={() => this.handleRemoveContact(email)}
         isVisible={isAddModalVisible}
         showDeleteButton={isAnUpdate}
-        title="Adicionar Contato">
-          <span>{errorMessage}</span>
-          <Input
-            haserror={nameRequiredError}
-            onChange={(e) => this.setState({ name: e.target.value })}
-            value={name}
-            placeholder="nome"
-            onKeyDown={(e) => e.key === 'Enter' && this.handleSaveContact()}
-          />
-          <Input
-            haserror={emailRequiredError}
-            onChange={(e) => this.setState({ email: e.target.value })}
-            value={email}
-            placeholder="email"
-            onKeyDown={(e) => e.key === 'Enter' && this.handleSaveContact()}
-          />
-           <StyledMaskedInput
-            mask={PHONE_MASK}
-            haserror={phoneRequiredError}
-            onChange={(e) => this.setState({ phone: e.target.value })}
-            value={phone}
-            placeholder="telefone"
-            onKeyDown={(e) => e.key === 'Enter' && this.handleSaveContact()}
-          />
-        </BaloonModal>
+        title="Adicionar Contato"
+      >
+        <span>{errorMessage}</span>
+        <Input
+          haserror={nameRequiredError}
+          onChange={e => this.setState({ name: e.target.value })}
+          value={name}
+          placeholder="nome"
+          onKeyDown={e => e.key === 'Enter' && this.handleSaveContact()}
+        />
+        <Input
+          haserror={emailRequiredError}
+          onChange={e => this.setState({ email: e.target.value })}
+          value={email}
+          placeholder="email"
+          onKeyDown={e => e.key === 'Enter' && this.handleSaveContact()}
+        />
+        <StyledMaskedInput
+          mask={PHONE_MASK}
+          haserror={phoneRequiredError}
+          onChange={e => this.setState({ phone: e.target.value })}
+          value={phone}
+          placeholder="telefone"
+          onKeyDown={e => e.key === 'Enter' && this.handleSaveContact()}
+        />
+      </BaloonModal>
     );
-  }
+  };
 
   render() {
     const { contacts, searchText } = this.state;
@@ -264,15 +289,15 @@ export default class Agenda extends Component {
             <StyledInput
               placeholder="Pesquisar"
               value={searchText}
-              onChange={(e) => this.setState({ searchText: e.target.value })}
-              onKeyDown={(e) => e.key === 'Enter' && this.filterContacts()}
+              onChange={e => this.setState({ searchText: e.target.value })}
+              onKeyDown={e => e.key === 'Enter' && this.filterContacts()}
             />
             <SearchButton onClick={this.filterContacts}>
               <FaSearch />
             </SearchButton>
           </SearchContainer>
           {contacts && contacts.length > 0 ? (
-            contacts.map((contact) => (
+            contacts.map(contact => (
               <Card
                 onCardClick={() => this.handleUpdateContact(contact)}
                 key={uuid.v4()}
@@ -286,7 +311,9 @@ export default class Agenda extends Component {
             <h2>Nenhum contato encontrado</h2>
           )}
         </AgendaBody>
-        <FabButton onClick={() => this.setState({ isAddModalVisible: true })}>+</FabButton>
+        <FabButton onClick={() => this.setState({ isAddModalVisible: true })}>
+          +
+        </FabButton>
       </Container>
     );
   }
