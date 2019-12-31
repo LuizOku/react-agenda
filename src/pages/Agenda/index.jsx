@@ -27,13 +27,13 @@ class Agenda extends Component {
       searchText: '',
       contacts: [],
       isAddModalVisible: false,
-      name: undefined,
+      name: '',
       nameRequiredError: false,
-      phone: undefined,
+      phone: '',
       phoneRequiredError: false,
-      email: undefined,
+      email: '',
       emailRequiredError: false,
-      errorMessage: undefined,
+      errorMessage: '',
       isPublic: false,
       isAnUpdate: false,
       contactToEdit: undefined
@@ -166,9 +166,9 @@ class Agenda extends Component {
     const newContacts = contacts.filter(contact => contact.email !== email);
     let objToSave;
     if (this.getUserFromPath()) {
-      objToSave = { ...this.getAllContactsObject(), [this.getUserFromPath()]: newContacts};
+      objToSave = { ...this.getAllContactsObject(), [this.getUserFromPath()]: newContacts };
     } else {
-      objToSave = { ...this.getAllContactsObject(), public: newContacts};
+      objToSave = { ...this.getAllContactsObject(), public: newContacts };
     }
     localStorage.setItem('contacts', JSON.stringify(objToSave));
     this.setState({
@@ -207,9 +207,9 @@ class Agenda extends Component {
       }
       let objToSave;
       if (!isPublic) {
-        objToSave = { ...this.getAllContactsObject(), [this.getUserFromPath()]: newContacts}
+        objToSave = { ...this.getAllContactsObject(), [this.getUserFromPath()]: newContacts }
       } else {
-        objToSave = { ...this.getAllContactsObject(), public: newContacts}
+        objToSave = { ...this.getAllContactsObject(), public: newContacts }
       }
       // Adiciona o contato do storage.
       localStorage.setItem('contacts', JSON.stringify(objToSave));
@@ -265,7 +265,7 @@ class Agenda extends Component {
       }
       if (!obj.phoneRequiredError && !isAnUpdate) {
         // Valida se telefone está repetido.
-        const findPhone = contacts.find(contact => contact.phone === phone);
+        const findPhone = contacts.find(contact => contact.phone === phone.replace(/[-+()\s]/g, ''));
         if (findPhone) {
           obj = {
             ...obj,
@@ -340,7 +340,8 @@ class Agenda extends Component {
         />
         <CheckBox
           label="Contato público"
-          checked={isPublic}
+          checked={!this.getUserFromPath() ? true : isPublic}
+          disabled={this.getUserFromPath() ? false : true}
           onChange={() => this.setState({ isPublic: !isPublic })}
         />
       </BaloonModal>
@@ -380,8 +381,8 @@ class Agenda extends Component {
               />
             ))
           ) : (
-            <h2>Nenhum contato encontrado</h2>
-          )}
+              <h2>Nenhum contato encontrado</h2>
+            )}
         </AgendaBody>
         <FabButton onClick={() => this.setState({ isAddModalVisible: true })}>
           +

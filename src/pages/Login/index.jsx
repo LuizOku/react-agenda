@@ -9,18 +9,19 @@ import {
   LoginContainer,
   LoginHeader,
   LoginBody,
-  StyledButton
+  StyledButton,
+  ButtonContainer
 } from './styles.css';
 
 class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: undefined,
-      password: undefined,
+      user: '',
+      password: '',
       userRequiredError: false,
       passwordRequiredError: false,
-      errorMessage: undefined
+      errorMessage: ''
     };
   }
 
@@ -44,6 +45,25 @@ class Login extends Component {
   };
 
   /**
+   * Redireciona para a tela de contatos públicos.
+   */
+  goToPublicContacts = () => {
+    const { history } = this.props;
+    history.push(`/agenda`);
+  }
+
+  /**
+   * Recupera os usuários do storage.
+   */
+  getUsersFromStorage = () => {
+    const usersStorage = localStorage.getItem('users');
+    if (usersStorage) {
+      return JSON.parse(usersStorage);
+    }
+    return [];
+  };
+
+  /**
    * Valida os campos do formulário.
    */
   isAuthenticationValid = (user, password) => {
@@ -52,11 +72,13 @@ class Login extends Component {
       passwordRequiredError: false,
       errorMessage: undefined
     });
+    const users = this.getUsersFromStorage();
+    const confirmUser = users.find(u => u.user === user && u.password === password);
     let obj = {};
     // Valida se usuário e senha foram preenchidos.
     if (user && password) {
       // Valida se usuário e senha estão corretos.
-      if (user !== 'admin' || password !== 'admin') {
+      if (!confirmUser && (user !== 'admin' || password !== 'admin')) {
         obj = {
           ...obj,
           errorMessage: 'Usuário ou senha incorretos'
@@ -118,8 +140,11 @@ class Login extends Component {
               placeholder="senha"
               onKeyDown={e => e.key === 'Enter' && this.handleLogin()}
             />
-            <StyledButton onClick={this.handleLogin}>Entrar</StyledButton>
-            <Link to="/agenda">Contatos públicos</Link>
+            <ButtonContainer>
+              <StyledButton onClick={this.handleLogin}>Entrar</StyledButton>
+              <StyledButton onClick={this.goToPublicContacts}>Contatos Públicos</StyledButton>
+            </ButtonContainer>
+            <Link to="/users">Cadastrar usuário</Link>
             <span>{errorMessage}</span>
           </LoginBody>
         </LoginContainer>

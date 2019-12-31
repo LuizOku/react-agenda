@@ -45,6 +45,7 @@ export const LoginBody = styled.div`
     color: #d50000;
   }
   a {
+    margin-top: 10px;
     text-align: center;
     text-decoration: none;
     color: #006064;
@@ -55,5 +56,13 @@ export const LoginBody = styled.div`
 `;
 
 export const StyledButton = styled(Button)`
+  margin: 0px;
   margin-top: 30px;
+  width: 128px;
+`;
+
+export const ButtonContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 `;
