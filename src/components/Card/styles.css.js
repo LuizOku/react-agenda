@@ -29,7 +29,7 @@ export const IconContainer = styled.div`
 `;
 
 export const InfoContainer = styled.div`
-  width: 25%;
+  width: 75%;
   height: 100%;
   display: flex;
   flex-direction: column;

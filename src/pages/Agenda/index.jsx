@@ -149,7 +149,7 @@ class Agenda extends Component {
   handleUpdateContact = contact => {
     this.setState({
       name: contact.name,
-      phone: contact.phone,
+      phone: `(${contact.phone.substring(0, 2)})${contact.phone.substring(2, 7)}-${contact.phone.substring(7, 11)}`,
       email: contact.email,
       isPublic: contact.isPublic,
       isAddModalVisible: true,
@@ -377,7 +377,7 @@ class Agenda extends Component {
                 icon={<FaUserCircle />}
                 name={contact.name}
                 email={contact.email}
-                phone={`(${contact.phone.substring(0, 2)}) ${contact.phone.substring(2, 7)}-${contact.phone.substring(7, 11)}`}
+                phone={`(${contact.phone.substring(0, 2)})${contact.phone.substring(2, 7)}-${contact.phone.substring(7, 11)}`}
               />
             ))
           ) : (
